@@ -1,0 +1,147 @@
+<html>
+  <head>
+    <title>Integration</title>
+
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"
+    ></script>
+
+    <link rel="stylesheet" type="text/css" href="index.css" />
+  </head>
+
+  <body>
+    <h1>My Contract</h1>
+
+    <button onclick="connectMetaMask()">Connect To Metamask</button> <br />
+    <p id="accountArea"></p>
+
+    <button onclick="connectContract()">Connect To Contract</button> <br />
+    <p id="ContractArea"></p>
+    Value Of A <input type="number" id="value1" value=" " /><br />
+
+    Value Of B <input type="number" id="value2" value=" " /><br />
+    <p></p>
+
+    <button onclick="Setter()">SetValue</button> <br />
+    <p></p>
+
+    <button onclick="readContract1()">GetA</button>
+    <p id="dataA">Value Of A</p>
+    <br />
+
+    <button onclick="readContract2()">GetB</button>
+    <p id="dataB">Value Of B</p>
+    <br />
+
+    <button onclick="readContract3()">getSum()</button>
+    <p id="dataGetSum">getSum</p>
+
+    <script>
+      // Connect to MetaMask
+      let account;
+      const connectMetaMask = async () => {
+        const accounts = await ethereum.request({
+          method: "eth_requestAccounts",
+        });
+        account = accounts[0];
+        document.getElementById("accountArea").innerHTML = account;
+      };
+
+      // Connect to Smart Contract
+      const connectContract = async () => {
+        const Abi = [
+          {
+            inputs: [
+              {
+                internalType: "uint256",
+                name: "firstNo",
+                type: "uint256",
+              },
+              {
+                internalType: "uint256",
+                name: "secondNo",
+                type: "uint256",
+              },
+            ],
+            name: "setter",
+            outputs: [],
+            stateMutability: "nonpayable",
+            type: "function",
+          },
+          {
+            inputs: [],
+            name: "a",
+            outputs: [
+              {
+                internalType: "uint256",
+                name: "",
+                type: "uint256",
+              },
+            ],
+            stateMutability: "view",
+            type: "function",
+          },
+          {
+            inputs: [],
+            name: "b",
+            outputs: [
+              {
+                internalType: "uint256",
+                name: "",
+                type: "uint256",
+              },
+            ],
+            stateMutability: "view",
+            type: "function",
+          },
+          {
+            inputs: [],
+            name: "getSum",
+            outputs: [
+              {
+                internalType: "uint256",
+                name: "",
+                type: "uint256",
+              },
+            ],
+            stateMutability: "view",
+            type: "function",
+          },
+        ];
+        const Address = "0x142594123D01EaE5D82Ffd0bCf166029c83E0dFC";
+        window.web3 = await new Web3(window.ethereum);
+        window.contract = await new window.web3.eth.Contract(Abi, Address);
+        document.getElementById("ContractArea").innerHTML =
+          "Connected to Smart Contract";
+      };
+      // Calling Setter Function from Smart Contract to set values.
+
+      const Setter = async () => {
+        let val1 = document.getElementById("value1").value;
+        let val2 = document.getElementById("value2").value;
+
+        window.contract.methods.setter(val1, val2).send({ from: account });
+        document.getElementById("value1").innerHTML = val1;
+        document.getElementById("value2").innerHTML = val2;
+      };
+
+      // Calling  Getter function  to get value.
+
+      const readContract1 = async () => {
+        const Data1 = await window.contract.methods.a().call();
+        document.getElementById("dataA").innerHTML = Data1;
+      };
+
+      const readContract2 = async () => {
+        const Data2 = await window.contract.methods.b().call();
+        document.getElementById("dataB").innerHTML = Data2;
+      };
+
+      const readContract3 = async () => {
+        const Data3 = await window.contract.methods.getSum().call();
+        document.getElementById("dataGetSum").innerHTML = Data3;
+      };
+    </script>
+  </body>
+</html>
